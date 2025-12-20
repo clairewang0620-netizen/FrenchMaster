@@ -17,7 +17,7 @@ const ReadingView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [showAllZh, setShowAllZh] = useState(false);
   const [zhVisibility, setZhVisibility] = useState<Record<number, boolean>>({});
 
-  // Use refs for logic control to avoid stale closure issues
+  // Use refs for logic control to avoid stale closure issues in callbacks
   const currentParagraphIndexRef = useRef<number | null>(null);
   const currentSentenceIndexRef = useRef<number>(0);
   const sentencesRef = useRef<string[]>([]);
@@ -54,6 +54,7 @@ const ReadingView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       const text = sentencesRef.current[currentSentenceIndexRef.current];
       
       speak(text, () => {
+        // If not manually paused or stopped, proceed
         if (currentParagraphIndexRef.current !== null && !window.speechSynthesis.paused) {
           currentSentenceIndexRef.current += 1;
           playNextChunk();
@@ -61,6 +62,7 @@ const ReadingView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       });
     } 
     else if (isAutoPlayingRef.current) {
+      // Move to next paragraph
       const nextParaIndex = (currentParagraphIndexRef.current || 0) + 1;
       if (nextParaIndex < currentArticle.paragraphs.length) {
         startParagraphPlayback(nextParaIndex, true);

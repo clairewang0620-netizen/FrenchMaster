@@ -156,7 +156,7 @@ const VocabularyView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                     <div className="pr-12">
                       <p className="text-lg font-semibold text-slate-800 mb-1 leading-relaxed">{ex.sentence}</p>
                       {ex.ipa && (
-                        <p className="text-xs font-mono text-slate-400 italic mb-2">[{ex.ipa}]</p>
+                        <p className="text-xs font-mono text-slate-400 italic mb-2">{ex.ipa}</p>
                       )}
                       <p className="text-sm text-slate-500 font-medium">{ex.translation}</p>
                     </div>
