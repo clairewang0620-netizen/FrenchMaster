@@ -28,7 +28,7 @@ const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
       <section className="mb-12 text-center">
         <h1 className="text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">
-          Bienvenue à L'Atelier!
+          Bonjour, 轻松学法语
         </h1>
         <p className="text-lg text-slate-600 max-w-xl mx-auto">
           您的专属法语学习工坊。
@@ -71,10 +71,6 @@ const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
           </svg>
         </button>
       </div>
-
-      <footer className="pt-8 border-t border-slate-200 text-center text-slate-400 text-sm">
-        Built with Gemini Pro & Flash • Optimized for Cloudflare
-      </footer>
     </div>
   );
 };

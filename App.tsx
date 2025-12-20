@@ -55,7 +55,7 @@ const App: React.FC = () => {
             className="text-xl font-bold bg-gradient-to-r from-blue-600 to-red-600 bg-clip-text text-transparent flex items-center gap-2"
           >
             <span className="text-2xl">🇫🇷</span>
-            L'Atelier Français
+            FrenchMaster
           </button>
         </div>
       </header>
@@ -69,7 +69,7 @@ const App: React.FC = () => {
         <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white shadow-2xl rounded-full px-6 py-3 border border-slate-200 flex items-center gap-6 md:hidden">
            <button onClick={() => navigate(AppRoute.HOME)} className="text-slate-500 hover:text-blue-600" title="首页">
              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7m-7 7h18" />
              </svg>
            </button>
            <button onClick={() => navigate(AppRoute.VOCABULARY)} className="text-slate-500 hover:text-blue-600" title="词库">
