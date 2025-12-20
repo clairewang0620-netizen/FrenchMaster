@@ -1,0 +1,7 @@
+{
+  "name": "L'Atelier Français",
+  "description": "A comprehensive French learning application featuring vocabulary, grammar, reading, and examinations powered by Gemini AI.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
