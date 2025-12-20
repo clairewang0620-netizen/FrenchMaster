@@ -13,7 +13,6 @@ const VocabularyView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [selectedWordIndex, setSelectedWordIndex] = useState<number | null>(null);
   
   const levels: ProficiencyLevel[] = ['A1', 'A2', 'B1', 'B2', 'C1'];
-  const WORDS_PER_LEVEL = 60;
 
   const currentLevelWords = useMemo(() => STATIC_VOCABULARY[level] || [], [level]);
   const knownWords = useMemo(() => getKnownWords(), [level]);
@@ -102,11 +101,11 @@ const VocabularyView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 
                 <button 
                   onClick={(e) => { e.stopPropagation(); speak(w.word); }}
-                  className="w-10 h-10 flex-shrink-0 flex items-center justify-center bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors shadow-sm"
+                  className="w-10 h-10 flex-shrink-0 flex items-center justify-center bg-[#28a745] text-white rounded-full hover:bg-green-600 transition-colors shadow-sm"
                   title="播放发音"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.414 0A5.982 5.982 0 0115 10a5.982 5.982 0 01-1.757 4.243 1 1 0 01-1.414-1.414A3.981 3.981 0 0013 10c0-1.104-.448-2.104-1.172-2.828a1 1 0 010-1.414z" clipRule="evenodd" />
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.85 14,18.71V20.77C18.01,19.86 21,16.28 21,12C21,7.72 18.01,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16.02C15.5,15.29 16.5,13.77 16.5,12M3,9V15H7L12,20V4L7,9H3Z" />
                   </svg>
                 </button>
 
@@ -135,10 +134,10 @@ const VocabularyView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 </div>
                 <button 
                   onClick={() => speak(currentWord.word)}
-                  className="w-16 h-16 flex items-center justify-center bg-green-500 text-white rounded-2xl hover:bg-green-600 transition-all shadow-lg shadow-green-100 hover:scale-105 active:scale-95"
+                  className="w-16 h-16 flex items-center justify-center bg-[#28a745] text-white rounded-2xl hover:bg-green-600 transition-all shadow-lg shadow-green-100 hover:scale-105 active:scale-95"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.414 0A5.982 5.982 0 0115 10a5.982 5.982 0 01-1.757 4.243 1 1 0 01-1.414-1.414A3.981 3.981 0 0013 10c0-1.104-.448-2.104-1.172-2.828a1 1 0 010-1.414z" clipRule="evenodd" />
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.85 14,18.71V20.77C18.01,19.86 21,16.28 21,12C21,7.72 18.01,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16.02C15.5,15.29 16.5,13.77 16.5,12M3,9V15H7L12,20V4L7,9H3Z" />
                   </svg>
                 </button>
               </div>
@@ -154,14 +153,19 @@ const VocabularyView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 </h4>
                 {currentWord.examples.map((ex, i) => (
                   <div key={i} className="bg-slate-50 p-6 rounded-2xl border border-slate-100 hover:bg-slate-100 transition-colors group/ex relative">
-                    <p className="text-lg font-semibold text-slate-800 mb-2 pr-12 leading-relaxed">{ex.sentence}</p>
-                    <p className="text-sm text-slate-500 font-medium">{ex.translation}</p>
+                    <div className="pr-12">
+                      <p className="text-lg font-semibold text-slate-800 mb-1 leading-relaxed">{ex.sentence}</p>
+                      {ex.ipa && (
+                        <p className="text-xs font-mono text-slate-400 italic mb-2">[{ex.ipa}]</p>
+                      )}
+                      <p className="text-sm text-slate-500 font-medium">{ex.translation}</p>
+                    </div>
                     <button 
                       onClick={() => speak(ex.sentence)}
-                      className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center bg-green-500 text-white rounded-xl hover:bg-green-600 shadow-sm transition-all"
+                      className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center bg-[#28a745] text-white rounded-xl hover:bg-green-600 shadow-sm transition-all active:scale-90"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217z" clipRule="evenodd" />
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.85 14,18.71V20.77C18.01,19.86 21,16.28 21,12C21,7.72 18.01,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16.02C15.5,15.29 16.5,13.77 16.5,12M3,9V15H7L12,20V4L7,9H3Z" />
                       </svg>
                     </button>
                   </div>

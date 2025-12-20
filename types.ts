@@ -9,6 +9,7 @@ export interface VocabularyWord {
   level: ProficiencyLevel;
   examples: {
     sentence: string;
+    ipa?: string; // Phonetic transcription for the example sentence
     translation: string;
   }[];
 }

@@ -1,30 +1,42 @@
 
 import { VocabularyWord, ProficiencyLevel } from '../types';
 
-const createWord = (level: ProficiencyLevel, id: string, word: string, phonetic: string, meaning: string, ex1: string, tr1: string, ex2: string, tr2: string): VocabularyWord => ({
+const createWord = (
+  level: ProficiencyLevel, 
+  id: string, 
+  word: string, 
+  phonetic: string, 
+  meaning: string, 
+  ex1: string, 
+  tr1: string, 
+  ex2: string, 
+  tr2: string,
+  ex1ipa?: string,
+  ex2ipa?: string
+): VocabularyWord => ({
   id: `${level}-${id}`,
   level,
   word,
   phonetic,
   meaning,
   examples: [
-    { sentence: ex1, translation: tr1 },
-    { sentence: ex2, translation: tr2 }
+    { sentence: ex1, translation: tr1, ipa: ex1ipa },
+    { sentence: ex2, translation: tr2, ipa: ex2ipa }
   ]
 });
 
 export const STATIC_VOCABULARY: Record<ProficiencyLevel, VocabularyWord[]> = {
   A1: [
-    createWord('A1', '1', 'bonjour', '/bɔ̃.ʒuʁ/', '你好', 'Bonjour, comment allez-vous ?', '你好，你好吗？', 'Il dit bonjour à son voisin.', '他向邻居打招呼。'),
-    createWord('A1', '2', 'merci', '/mɛʁ.si/', '谢谢', 'Merci beaucoup pour votre aide.', '非常感谢您的帮助。', 'Un grand merci à tous.', '非常感谢大家。'),
-    createWord('A1', '3', 'oui', '/wi/', '是', 'Oui, je comprends.', '是的，我明白。', 'Elle a dit oui.', '她说是的。'),
-    createWord('A1', '4', 'non', '/nɔ̃/', '不', 'Non, ce n\'est pas possible.', '不，这不可能。', 'Il répond non à la question.', '他回答说不。'),
-    createWord('A1', '5', 'homme', '/ɔm/', '男人', 'C\'est un homme très gentil.', '他是一个非常友善的人。', 'L\'homme marche dans la rue.', '那个男人在街上走。'),
-    createWord('A1', '6', 'femme', '/fam/', '女人', 'La femme lit un livre.', '那个女人在读书。', 'C\'est une femme d\'affaires.', '她是一位女商人。'),
-    createWord('A1', '7', 'enfant', '/ɑ̃.fɑ̃/', '孩子', 'L\'enfant joue au parc.', '孩子在公园里玩。', 'C\'est un enfant sage.', '这是一个乖孩子。'),
-    createWord('A1', '8', 'ami', '/a.mi/', '朋友', 'C\'est mon meilleur ami.', '这是我最好的朋友。', 'Il va chez un ami.', '他去一个朋友家。'),
-    createWord('A1', '9', 'famille', '/fa.mij/', '家庭', 'J\'aime ma famille.', '我爱我的家人。', 'La famille est importante.', '家庭很重要。'),
-    createWord('A1', '10', 'maison', '/mɛ.zɔ̃/', '房子', 'Ma maison est bleue.', '我的房子是蓝色的。', 'Il reste à la maison.', '他待在家里。'),
+    createWord('A1', '1', 'bonjour', '/bɔ̃.ʒuʁ/', '你好', 'Bonjour, comment allez-vous ?', '你好，你好吗？', 'Il dit bonjour à son voisin.', '他向邻居打招呼。', '/bɔ̃.ʒuʁ kɔ.mɑ̃ a.le vu/', '/il di bɔ̃.ʒuʁ a sɔ̃ vwa.zɛ̃/'),
+    createWord('A1', '2', 'merci', '/mɛʁ.si/', '谢谢', 'Merci beaucoup pour votre aide.', '非常感谢您的帮助。', 'Un grand merci à tous.', '非常感谢大家。', '/mɛʁ.si bo.ku puʁ vɔ.tʁ ɛd/', '/œ̃ ɡʁɑ̃ mɛʁ.si a tus/'),
+    createWord('A1', '3', 'oui', '/wi/', '是', 'Oui, je comprends.', '是的，我明白。', 'Elle a dit oui.', '她说是的。', '/wi ʒə kɔ̃.pʁɑ̃/', '/ɛl a di wi/'),
+    createWord('A1', '4', 'non', '/nɔ̃/', '不', 'Non, ce n\'est pas possible.', '不，这不可能。', 'Il répond non à la question.', '他回答说不。', '/nɔ̃ sə nɛ pa pɔ.si.bl/', '/il ʁe.pɔ̃ nɔ̃ a la kɛs.tjɔ̃/'),
+    createWord('A1', '5', 'homme', '/ɔm/', '男人', 'C\'est un homme très gentil.', '他是一个非常友善的人。', 'L\'homme marche dans la rue.', '那个男人在街上走。', '/sɛ œ̃ nɔm tʁɛ ʒɑ̃.ti/', '/lɔm maʁʃ dɑ̃ la ʁy/'),
+    createWord('A1', '6', 'femme', '/fam/', '女人', 'La femme lit un livre.', '那个女人在读书。', 'C\'est une femme d\'affaires.', '她是一位女商人。', '/la fam li œ̃ livʁ/', '/sɛt yn fam da.fɛʁ/'),
+    createWord('A1', '7', 'enfant', '/ɑ̃.fɑ̃/', '孩子', 'L\'enfant joue au parc.', '孩子在公园里玩。', 'C\'est un enfant sage.', '这是一个乖孩子。', '/lɑ̃.fɑ̃ ʒu o paʁk/', '/sɛ œ̃ nɑ̃.fɑ̃ saʒ/'),
+    createWord('A1', '8', 'ami', '/a.mi/', '朋友', 'C\'est mon meilleur ami.', '这是我最好的朋友。', 'Il va chez un ami.', '他去一个朋友家。', '/sɛ mɔ̃ mɛ.jœʁ a.mi/', '/il va ʃe œ̃ na.mi/'),
+    createWord('A1', '9', 'famille', '/fa.mij/', '家庭', 'J\'aime ma famille.', '我爱我的家人。', 'La famille est importante.', '家庭很重要。', '/ʒɛm ma fa.mij/', '/la fa.mij ɛ tɛ̃.pɔʁ.tɑ̃t/'),
+    createWord('A1', '10', 'maison', '/mɛ.zɔ̃/', '房子', 'Ma maison est bleue.', '我的房子是蓝色的。', 'Il reste à la maison.', '他待在家里。', '/ma mɛ.zɔ̃ ɛ blø/', '/il ʁɛst a la mɛ.zɔ̃/'),
     createWord('A1', '11', 'travail', '/tʁa.vaj/', '工作', 'Il aime son travail.', '他喜欢他的工作。', 'Le travail commence à huit heures.', '工作八点开始。'),
     createWord('A1', '12', 'école', '/e.kɔl/', '学校', 'Je vais à l\'école.', '我去上学。', 'L\'école est fermée le dimanche.', '学校周日关闭。'),
     createWord('A1', '13', 'eau', '/o/', '水', 'Je bois de l\'eau.', '我喝水。', 'L\'eau est très froide.', '水非常冷。'),
@@ -109,7 +121,7 @@ export const STATIC_VOCABULARY: Record<ProficiencyLevel, VocabularyWord[]> = {
     createWord('A2', '30', 'trouver', '/tʁu.ve/', '找到/觉得', 'J\'ai trouvé un emploi.', '我找到工作了。', 'Je trouve ça génial.', '我觉得这太棒了。'),
     createWord('A2', '31', 'vendre', '/vɑ̃dʁ/', '卖', 'Il vend sa maison.', '他在卖他的房子。', 'Le magasin vend des fruits.', '商店卖水果。'),
     createWord('A2', '32', 'vivre', '/vivʁ/', '生活', 'Elle vit à Lyon.', '她住在里昂。', 'Vivre est magnifique.', '生活是美好的。'),
-    createWord('A2', '33', 'savoir', '/sa.vwaʁ/', '知道/会', 'Je sais parler français.', '我会说法语。', 'Est-ce que tu sais l\'heure ?', '你知道几点了吗？'),
+    createWord('A2', '33', 'savoir', '/sa.vwaʁ/', '知道/会', 'Je sais parler français.', '我会说法语。', 'Est-code que tu sais l\'heure ?', '你知道几点了吗？'),
     createWord('A2', '34', 'vouloir', '/vu.lwaʁ/', '想要', 'Je veux un café.', '我要杯咖啡。', 'Voulez-vous danser ?', '你想跳舞吗？'),
     createWord('A2', '35', 'devoir', '/də.vwaʁ/', '应该/欠', 'Tu dois travailler.', '你应该工作。', 'Il me doit de l\'argent.', '他欠我钱。'),
     createWord('A2', '36', 'pouvoir', '/pu.vwaʁ/', '能够', 'Je peux t\'aider.', '我可以帮你。', 'Pouvez-vous répéter ?', '你能重复一遍吗？'),
@@ -146,7 +158,7 @@ export const STATIC_VOCABULARY: Record<ProficiencyLevel, VocabularyWord[]> = {
     createWord('B1', '5', 'éviter', '/e.vi.te/', '避免', 'Il faut éviter les erreurs.', '必须避免错误。', 'Elle évite de parler de son passé.', '她避免谈论她的过去。'),
     createWord('B1', '6', 'protéger', '/pʁo.te.ʒe/', '保护', 'Nous protégeons l\'environnement.', '我们保护环境。', 'Il porte un casque pour se protéger.', '他戴头盔来保护自己。'),
     createWord('B1', '7', 'organiser', '/ɔʁ.ga.ni.ze/', '组织', 'Elle organise une fête.', '她正在组织一个聚会。', 'Organisons notre travail.', '让我们组织一下我们的工作。'),
-    createWord('B1', '8', 'préparer', '/pʁe.pa.ʁe/', '准备', 'Je prépare le dîner.', '我在准备晚餐。', 'Préparez vos bagages.', '准备好您的行李。'),
+    createWord('B1', '8', 'préparer', '/pʁe.pa.ʁe/', '准备', 'Je prepare le dîner.', '我在准备晚餐。', 'Préparez vos bagages.', '准备好您的行李。'),
     createWord('B1', '9', 'participer', '/paʁ.ti.si.pe/', '参加', 'Il participe à la réunion.', '他参加会议。', 'Nous participons au projet.', '我们参与这个项目。'),
     createWord('B1', '10', 'choisir', '/ʃwa.ziʁ/', '选择', 'Vous devez choisir une option.', '您必须选择一个选项。', 'Elle choisit sa carrière.', '她选择了她的职业。'),
     createWord('B1', '11', 'décider', '/de.si.de/', '决定', 'J\'ai décidé de partir.', '我决定离开了。', 'C\'est à vous de décider.', '由您来决定。'),
