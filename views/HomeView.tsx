@@ -8,17 +8,17 @@ interface HomeViewProps {
 
 const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
   const mainModules = [
-    { id: AppRoute.VOCABULARY, title: '单词词库', icon: '📚', desc: 'A1-C1 核心词汇，分级突破', color: 'bg-blue-50 text-blue-700 border-blue-100' },
-    { id: AppRoute.DAILY_CONVERSATION, title: '日常口语', icon: '🗨️', desc: '300 句实用会话，涵盖 6 大场景', color: 'bg-amber-50 text-amber-700 border-amber-100' },
-    { id: AppRoute.GRAMMAR, title: '基础语法', icon: '✍️', desc: '结构化语法体系，循序渐进', color: 'bg-purple-50 text-purple-700 border-purple-100' },
-    { id: AppRoute.READING, title: '精选阅读', icon: '📖', desc: '深度美文，提升语感与词汇', color: 'bg-teal-50 text-teal-700 border-teal-100' },
-    { id: AppRoute.DICTATION, title: '听写测试', icon: '🎧', desc: '强化记忆，精准掌握拼写', color: 'bg-orange-50 text-orange-700 border-orange-100' },
-    { id: AppRoute.TEST, title: '测试', icon: '🎓', desc: '多维测评，检验学习成果', color: 'bg-red-50 text-red-700 border-red-100' },
+    { id: AppRoute.VOCABULARY, title: '单词 • Vocabulaire', icon: '📚', desc: 'A1-C1 核心词汇，分级突破', color: 'bg-blue-50 text-blue-700 border-blue-100' },
+    { id: AppRoute.DAILY_CONVERSATION, title: '日常口语 • Conversation', icon: '🗨️', desc: '300 句实用会话，涵盖 6 大场景', color: 'bg-amber-50 text-amber-700 border-amber-100' },
+    { id: AppRoute.GRAMMAR, title: '语法 • Grammaire', icon: '✍️', desc: '结构化语法体系，循序渐进', color: 'bg-purple-50 text-purple-700 border-purple-100' },
+    { id: AppRoute.READING, title: '精选阅读 • Lecture Sélectionnée', icon: '📖', desc: '深度美文，提升语感与词汇', color: 'bg-teal-50 text-teal-700 border-teal-100' },
+    { id: AppRoute.DICTATION, title: '听写测试 • Dictée', icon: '🎧', desc: '强化记忆，精准掌握拼写', color: 'bg-orange-50 text-orange-700 border-orange-100' },
+    { id: AppRoute.TEST, title: '测试 • Test', icon: '🎓', desc: '多维测评，检验学习成果', color: 'bg-red-50 text-red-700 border-red-100' },
   ];
 
   const memoryModule = {
     id: AppRoute.MISTAKES,
-    title: '强化记忆',
+    title: '强化记忆 • Révision',
     icon: '🧠',
     desc: '集合听写错词、测试错题及个人强化词汇',
     color: 'bg-indigo-50 text-indigo-700 border-indigo-100'
