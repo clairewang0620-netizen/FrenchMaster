@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { AppRoute } from '../types';
+import { clearAccess } from '../services/storageService';
 
 interface HomeViewProps {
   onNavigate: (route: AppRoute) => void;
@@ -22,6 +23,13 @@ const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
     icon: '🧠',
     desc: '集合听写错词、测试错题及个人强化词汇',
     color: 'bg-indigo-50 text-indigo-700 border-indigo-100'
+  };
+
+  const handleLogout = () => {
+    if (confirm('确定要清除访问授权吗？清除后需重新输入访问码。')) {
+      clearAccess();
+      window.location.reload();
+    }
   };
 
   return (
@@ -53,7 +61,7 @@ const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
         ))}
       </div>
 
-      <div className="mb-16">
+      <div className="mb-12">
         <h2 className="text-xl font-bold text-slate-800 mb-4 px-2">记忆工坊</h2>
         <button
           onClick={() => onNavigate(memoryModule.id)}
@@ -71,6 +79,15 @@ const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
           </svg>
         </button>
       </div>
+
+      <footer className="text-center py-8 opacity-40 hover:opacity-100 transition-opacity">
+        <button 
+          onClick={handleLogout}
+          className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-red-500 transition-colors"
+        >
+          安全退出授权 · Logout Session
+        </button>
+      </footer>
     </div>
   );
 };

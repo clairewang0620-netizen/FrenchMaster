@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { AppRoute } from './types';
+import { hasAccess } from './services/storageService';
 import HomeView from './views/HomeView';
 import VocabularyView from './views/VocabularyView';
 import DailyConversationView from './views/DailyConversationView';
@@ -9,9 +10,11 @@ import ReadingView from './views/ReadingView';
 import DictationView from './views/DictationView';
 import ExamView from './views/ExamView';
 import MistakesView from './views/MistakesView';
+import AccessCodeView from './views/AccessCodeView';
 
 const App: React.FC = () => {
   const [currentRoute, setCurrentRoute] = useState<AppRoute>(AppRoute.HOME);
+  const [isAuthorized, setIsAuthorized] = useState<boolean>(hasAccess());
 
   // Simple hash-based router simulation
   useEffect(() => {
@@ -32,6 +35,10 @@ const App: React.FC = () => {
   const navigate = (route: AppRoute) => {
     window.location.hash = `#/${route}`;
   };
+
+  if (!isAuthorized) {
+    return <AccessCodeView onUnlock={() => setIsAuthorized(true)} />;
+  }
 
   const renderView = () => {
     switch (currentRoute) {

@@ -5,7 +5,24 @@ const KEYS = {
   STRENGTHEN_SET: 'french_app_strengthen_set',
   KNOWN_WORDS: 'french_app_known_words',
   WRONG_ANSWERS: 'french_app_wrong_answers',
-  ERROR_BOOK: 'french_app_error_book'
+  ERROR_BOOK: 'french_app_error_book',
+  ACCESS_GRANTED: 'french_access_granted',
+  ACCESS_CODE: 'french_access_code'
+};
+
+// Access Control Logic
+export const hasAccess = (): boolean => {
+  return localStorage.getItem(KEYS.ACCESS_GRANTED) === 'true';
+};
+
+export const saveAccess = (code: string) => {
+  localStorage.setItem(KEYS.ACCESS_GRANTED, 'true');
+  localStorage.setItem(KEYS.ACCESS_CODE, code);
+};
+
+export const clearAccess = () => {
+  localStorage.removeItem(KEYS.ACCESS_GRANTED);
+  localStorage.removeItem(KEYS.ACCESS_CODE);
 };
 
 export const addToStrengthenSet = (word: VocabularyWord) => {
