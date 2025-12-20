@@ -31,11 +31,9 @@ const ReadingView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   // Utility to split text into sentences carefully
   const splitIntoSentences = (text: string): string[] => {
-    // Regex matches common French sentence endings while keeping the punctuation
     return text.match(/[^.!?]+[.!?]+(?:\s|$)/g)?.map(s => s.trim()) || [text];
   };
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       stopSpeech();
@@ -43,7 +41,6 @@ const ReadingView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     };
   }, []);
 
-  // Reset states when changing article
   useEffect(() => {
     handleStop();
     setZhVisibility({});
@@ -53,29 +50,24 @@ const ReadingView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const playNextChunk = () => {
     if (!currentArticle) return;
     
-    // Check if we have more sentences in the current paragraph
     if (currentSentenceIndexRef.current < sentencesRef.current.length) {
       const text = sentencesRef.current[currentSentenceIndexRef.current];
       
       speak(text, () => {
-        // Guard: check if we are still active and not paused/stopped
         if (currentParagraphIndexRef.current !== null && !window.speechSynthesis.paused) {
           currentSentenceIndexRef.current += 1;
           playNextChunk();
         }
       });
     } 
-    // If no more sentences, check if we should move to next paragraph
     else if (isAutoPlayingRef.current) {
       const nextParaIndex = (currentParagraphIndexRef.current || 0) + 1;
       if (nextParaIndex < currentArticle.paragraphs.length) {
         startParagraphPlayback(nextParaIndex, true);
       } else {
-        // Reached end of article
         handleStop();
       }
     } else {
-      // Single paragraph finished
       setActiveParagraphIndex(null);
       currentParagraphIndexRef.current = null;
     }
@@ -194,7 +186,7 @@ const ReadingView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         <div className="flex items-center gap-3">
           <button 
             onClick={() => setShowAllZh(!showAllZh)}
-            className={`px-4 py-2 rounded-full text-xs font-bold transition-all border-2 ${showAllZh ? 'bg-teal-50 border-teal-500 text-teal-600' : 'bg-white border-slate-200 text-slate-500'}`}
+            className={`px-4 py-2 rounded-full text-[12px] font-bold transition-all border-2 ${showAllZh ? 'bg-teal-50 border-teal-500 text-teal-600' : 'bg-white border-slate-200 text-slate-500'}`}
           >
             {showAllZh ? '隐藏全文翻译' : '显示全文翻译'}
           </button>
@@ -207,7 +199,7 @@ const ReadingView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
               </svg>
-              {isPaused ? '继续播放' : '播放全文'}
+              {isPaused ? '继续' : '播放全文'}
             </button>
           ) : (
             <button 
@@ -217,7 +209,7 @@ const ReadingView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
               </svg>
-              暂停播放
+              暂停
             </button>
           )}
 
@@ -237,9 +229,9 @@ const ReadingView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
       <article className="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-xl border border-slate-100 mb-10">
         <header className="mb-12 text-center">
-          <h2 className="text-4xl font-black text-slate-900 mb-4 leading-tight">{currentArticle.title.fr}</h2>
+          <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4 leading-tight">{currentArticle.title.fr}</h2>
           <p className="text-xl font-bold text-teal-600">{currentArticle.title.zh}</p>
-          <div className="mt-4 inline-block px-4 py-1.5 bg-teal-50 text-teal-600 rounded-full text-xs font-black uppercase tracking-widest">
+          <div className="mt-4 inline-block px-4 py-1.5 bg-teal-50 text-teal-600 rounded-full text-[10px] font-black uppercase tracking-widest">
             Niveau {level}
           </div>
         </header>
@@ -277,16 +269,15 @@ const ReadingView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217z" clipRule="evenodd" />
                         </svg>
-                        朗读本段
+                        朗读
                       </button>
                     </div>
                   </div>
-                  <p className={`text-xl leading-relaxed font-medium mb-3 transition-colors duration-300 ${activeParagraphIndex === idx ? 'text-teal-900' : 'text-slate-800'}`}>
+                  <p className={`text-[16px] leading-[1.6] font-serif transition-colors duration-300 ${activeParagraphIndex === idx ? 'text-teal-900 font-bold' : 'text-[#333333]'}`} style={{ fontFamily: "'Georgia', 'Times New Roman', serif" }}>
                     {p.fr}
                   </p>
-                  <p className="text-xs font-mono text-slate-400 mb-4 italic bg-slate-100/50 p-2 rounded-lg inline-block">{p.ipa}</p>
                   {(showAllZh || zhVisibility[idx]) && (
-                    <div className="p-5 bg-white shadow-inner rounded-2xl text-slate-700 font-medium border-l-4 border-teal-500 animate-in slide-in-from-top-2 duration-300">
+                    <div className="p-5 mt-4 bg-white shadow-inner rounded-2xl text-slate-700 text-sm font-medium border-l-4 border-teal-500 animate-in slide-in-from-top-2 duration-300">
                       {p.zh}
                     </div>
                   )}
@@ -306,19 +297,20 @@ const ReadingView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {currentArticle.keywords.map((kw, i) => (
-              <div key={i} className="flex items-start gap-4 p-5 rounded-2xl bg-slate-50 border border-slate-100 group hover:border-teal-200 transition-all">
+              <div key={i} className="flex items-center gap-4 p-5 rounded-2xl bg-slate-50 border border-slate-100 group hover:border-teal-200 transition-all">
                 <button 
                   onClick={() => speak(kw.word)}
-                  className="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-white text-teal-600 rounded-2xl shadow-sm hover:bg-teal-600 hover:text-white transition-all active:scale-90"
+                  className="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-white text-[#28a745] rounded-full shadow-sm hover:bg-[#28a745] hover:text-white transition-all active:scale-90"
+                  style={{ width: '48px', height: '48px' }}
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217z" clipRule="evenodd" />
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.85 14,18.71V20.77C18.01,19.86 21,16.28 21,12C21,7.72 18.01,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16.02C15.5,15.29 16.5,13.77 16.5,12M3,9V15H7L12,20V4L7,9H3Z" />
                   </svg>
                 </button>
                 <div className="flex-1">
-                  <div className="flex items-baseline gap-2 mb-1">
-                    <span className="text-lg font-bold text-slate-900">{kw.word}</span>
-                    <span className="text-[10px] font-mono text-slate-400 font-bold">{kw.ipa}</span>
+                  <div className="flex items-baseline gap-2 mb-1 flex-wrap">
+                    <h4 className="text-lg font-bold text-slate-900">{kw.word}</h4>
+                    <span className="text-xs font-mono text-slate-400 italic">[{kw.ipa}]</span>
                   </div>
                   <p className="text-sm font-bold text-teal-600">{kw.zh}</p>
                 </div>
