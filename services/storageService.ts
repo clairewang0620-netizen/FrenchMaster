@@ -10,64 +10,106 @@ const KEYS = {
   ACCESS_CODE: 'french_access_code'
 };
 
+// Internal safe storage helper
+const safeGet = (key: string): string | null => {
+  try {
+    return localStorage.getItem(key);
+  } catch (e) {
+    console.error('Storage Read Error:', e);
+    return null;
+  }
+};
+
+const safeSet = (key: string, value: string) => {
+  try {
+    localStorage.setItem(key, value);
+  } catch (e) {
+    console.error('Storage Write Error:', e);
+  }
+};
+
+const safeRemove = (key: string) => {
+  try {
+    localStorage.removeItem(key);
+  } catch (e) {
+    console.error('Storage Remove Error:', e);
+  }
+};
+
 // Access Control Logic
 export const hasAccess = (): boolean => {
-  return localStorage.getItem(KEYS.ACCESS_GRANTED) === 'true';
+  return safeGet(KEYS.ACCESS_GRANTED) === 'true';
 };
 
 export const saveAccess = (code: string) => {
-  localStorage.setItem(KEYS.ACCESS_GRANTED, 'true');
-  localStorage.setItem(KEYS.ACCESS_CODE, code);
+  safeSet(KEYS.ACCESS_GRANTED, 'true');
+  safeSet(KEYS.ACCESS_CODE, code);
 };
 
 export const clearAccess = () => {
-  localStorage.removeItem(KEYS.ACCESS_GRANTED);
-  localStorage.removeItem(KEYS.ACCESS_CODE);
+  safeRemove(KEYS.ACCESS_GRANTED);
+  safeRemove(KEYS.ACCESS_CODE);
 };
 
 export const addToStrengthenSet = (word: VocabularyWord) => {
   const set = getStrengthenSet();
   if (!set.find(w => w.word === word.word)) {
-    localStorage.setItem(KEYS.STRENGTHEN_SET, JSON.stringify([...set, word]));
+    safeSet(KEYS.STRENGTHEN_SET, JSON.stringify([...set, word]));
   }
 };
 
 export const removeFromStrengthenSet = (wordStr: string) => {
   const set = getStrengthenSet();
-  localStorage.setItem(KEYS.STRENGTHEN_SET, JSON.stringify(set.filter(w => w.word !== wordStr)));
+  safeSet(KEYS.STRENGTHEN_SET, JSON.stringify(set.filter(w => w.word !== wordStr)));
 };
 
 export const getStrengthenSet = (): VocabularyWord[] => {
-  const data = localStorage.getItem(KEYS.STRENGTHEN_SET);
-  return data ? JSON.parse(data) : [];
+  const data = safeGet(KEYS.STRENGTHEN_SET);
+  try {
+    return data ? JSON.parse(data) : [];
+  } catch {
+    return [];
+  }
 };
 
 export const markAsKnown = (wordStr: string) => {
   const known = getKnownWords();
   if (!known.includes(wordStr)) {
-    localStorage.setItem(KEYS.KNOWN_WORDS, JSON.stringify([...known, wordStr]));
+    safeSet(KEYS.KNOWN_WORDS, JSON.stringify([...known, wordStr]));
   }
 };
 
 export const getKnownWords = (): string[] => {
-  const data = localStorage.getItem(KEYS.KNOWN_WORDS);
-  return data ? JSON.parse(data) : [];
+  const data = safeGet(KEYS.KNOWN_WORDS);
+  try {
+    return data ? JSON.parse(data) : [];
+  } catch {
+    return [];
+  }
 };
 
 export const recordWrongAnswer = (question: any) => {
   const wrong = getWrongAnswers();
-  localStorage.setItem(KEYS.WRONG_ANSWERS, JSON.stringify([...wrong, { ...question, date: new Date().toISOString() }]));
+  safeSet(KEYS.WRONG_ANSWERS, JSON.stringify([...wrong, { ...question, date: new Date().toISOString() }]));
 };
 
 export const getWrongAnswers = (): any[] => {
-  const data = localStorage.getItem(KEYS.WRONG_ANSWERS);
-  return data ? JSON.parse(data) : [];
+  const data = safeGet(KEYS.WRONG_ANSWERS);
+  try {
+    return data ? JSON.parse(data) : [];
+  } catch {
+    return [];
+  }
 };
 
 // Error Book Logic for Dictation
 export const getErrorBook = (): ErrorBookItem[] => {
-  const data = localStorage.getItem(KEYS.ERROR_BOOK);
-  return data ? JSON.parse(data) : [];
+  const data = safeGet(KEYS.ERROR_BOOK);
+  try {
+    return data ? JSON.parse(data) : [];
+  } catch {
+    return [];
+  }
 };
 
 // Manual entry into Error Book
@@ -76,7 +118,7 @@ export const manualAddToErrorBook = (word: VocabularyWord) => {
   const index = book.findIndex(item => item.word.word === word.word);
   if (index === -1) {
     book.push({ word, errorCount: 1, correctStreak: 0 });
-    localStorage.setItem(KEYS.ERROR_BOOK, JSON.stringify(book));
+    safeSet(KEYS.ERROR_BOOK, JSON.stringify(book));
   }
 };
 
@@ -95,6 +137,6 @@ export const updateErrorBookStreak = (word: VocabularyWord, isCorrect: boolean) 
       book[index].errorCount += 1;
       book[index].correctStreak = 0;
     }
-    localStorage.setItem(KEYS.ERROR_BOOK, JSON.stringify(book));
+    safeSet(KEYS.ERROR_BOOK, JSON.stringify(book));
   }
 };
