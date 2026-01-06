@@ -54,7 +54,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-blue-100">
+    <div className="min-h-[100svh] w-full bg-slate-50 text-slate-900 selection:bg-blue-100 relative">
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
         <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
           <button 
@@ -71,7 +71,7 @@ const App: React.FC = () => {
         {renderView()}
       </main>
 
-      {/* Mobile Navigation Dock */}
+      {/* Mobile/Tablet Navigation Dock */}
       {currentRoute !== AppRoute.HOME && (
         <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white shadow-2xl rounded-full px-6 py-3 border border-slate-200 flex items-center gap-6 md:hidden">
            <button onClick={() => navigate(AppRoute.HOME)} className="text-slate-500 hover:text-blue-600" title="首页">

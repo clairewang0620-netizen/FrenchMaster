@@ -52,7 +52,7 @@ const AccessCodeView: React.FC<AccessCodeViewProps> = ({ onUnlock }) => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+    <div className="min-h-[100svh] w-full bg-slate-50 flex items-center justify-center p-4 relative">
       <div className="max-w-md w-full bg-white rounded-[2rem] shadow-2xl p-8 border border-slate-100 text-center animate-in zoom-in-95 duration-500">
         <div className="text-5xl mb-6">🔐</div>
         <h1 className="text-2xl font-black text-slate-800 mb-2">欢迎使用 FrenchMaster</h1>
