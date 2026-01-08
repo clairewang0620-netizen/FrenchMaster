@@ -1,14 +1,14 @@
 
 /**
  * Standard Web Speech API implementation.
- * Provides stable pronunciation for Desktop and iOS.
- * Fixed: Explicitly binding French voice to prevent English fallback on mobile.
+ * Optimized for natural intonation, neural voice selection, and site-wide mutual exclusion.
  */
 
-let currentUtterance: SpeechSynthesisUtterance | null = null;
+let currentNativeAudio: HTMLAudioElement | null = null;
 
 /**
- * Finds the best available French voice on the current device.
+ * Finds the highest quality French voice available on the device.
+ * Prioritizes neural and premium voices for realistic liaisons and intonation.
  */
 const getFrenchVoice = (): SpeechSynthesisVoice | null => {
   if (typeof window === 'undefined' || !window.speechSynthesis) return null;
@@ -16,58 +16,83 @@ const getFrenchVoice = (): SpeechSynthesisVoice | null => {
   const voices = window.speechSynthesis.getVoices();
   if (!voices || voices.length === 0) return null;
 
-  // Attempt to find exact match for France French
-  let voice = voices.find(v => v.lang === 'fr-FR' || v.lang === 'fr_FR');
+  // Prioritize Neural/Premium/Enhanced voices which sound like humans, not robots
+  const frVoices = voices.filter(v => v.lang.replace('_', '-') === 'fr-FR');
   
-  // Fallback: search for any French language variant (e.g., fr-CA, fr-BE)
-  if (!voice) {
-    voice = voices.find(v => v.lang.toLowerCase().startsWith('fr'));
-  }
+  let bestVoice = frVoices.find(v => 
+    v.name.toLowerCase().includes('neural') || 
+    v.name.toLowerCase().includes('premium') || 
+    v.name.toLowerCase().includes('enhanced') ||
+    v.name.toLowerCase().includes('google')
+  );
   
-  return voice || null;
+  if (!bestVoice) bestVoice = frVoices[0];
+  if (!bestVoice) bestVoice = voices.find(v => v.lang.toLowerCase().startsWith('fr'));
+  
+  return bestVoice || null;
 };
 
-export const speak = (text: string, onEnd?: () => void) => {
+/**
+ * Site-wide stop function for ALL audio sources (TTS and Native Audio).
+ */
+export const stopAllAudio = () => {
+  if (window.speechSynthesis) {
+    window.speechSynthesis.cancel();
+  }
+  if (currentNativeAudio) {
+    currentNativeAudio.pause();
+    currentNativeAudio.currentTime = 0;
+    currentNativeAudio = null;
+  }
+};
+
+/**
+ * Play a native audio URL (e.g., user recording) with mutual exclusion.
+ */
+export const playNativeAudio = (url: string) => {
+  stopAllAudio();
+  const audio = new Audio(url);
+  currentNativeAudio = audio;
+  audio.play().catch(e => console.warn('Audio playback prevented:', e));
+};
+
+/**
+ * Natural TTS speech function with immediate cancellation of existing audio.
+ */
+export const speak = (text: string, rate: number = 1.0, onEnd?: () => void) => {
   if (!window.speechSynthesis) {
-    console.warn('SpeechSynthesis is not supported on this device/browser.');
     if (onEnd) onEnd();
     return;
   }
 
   try {
-    // Cancel any ongoing speech
-    window.speechSynthesis.cancel();
+    // FORCE STOP any current audio activity immediately
+    stopAllAudio();
 
     const utterance = new SpeechSynthesisUtterance(text);
-    
-    // Mandatory language setting
     utterance.lang = 'fr-FR';
     
-    // Explicitly bind a French voice to prevent mobile OS from defaulting to English
-    const frenchVoice = getFrenchVoice();
-    if (frenchVoice) {
-      utterance.voice = frenchVoice;
+    const voice = getFrenchVoice();
+    if (voice) {
+      utterance.voice = voice;
     }
 
-    utterance.rate = 1.0;
+    // Parameters for natural, non-robotic flow
+    utterance.rate = rate; 
     utterance.pitch = 1.0;
+    utterance.volume = 1.0;
 
     utterance.onend = () => {
       if (onEnd) onEnd();
-      currentUtterance = null;
     };
 
-    utterance.onerror = (event) => {
-      // Log error but attempt to continue
-      console.warn('SpeechSynthesis error:', event);
+    utterance.onerror = () => {
       if (onEnd) onEnd();
-      currentUtterance = null;
     };
 
-    currentUtterance = utterance;
     window.speechSynthesis.speak(utterance);
   } catch (e) {
-    console.error('Speech Synthesis Runtime Error:', e);
+    console.error('TTS Runtime Error:', e);
     if (onEnd) onEnd();
   }
 };
@@ -80,9 +105,5 @@ export const resumeSpeech = () => {
   if (window.speechSynthesis) window.speechSynthesis.resume();
 };
 
-export const stopSpeech = () => {
-  if (window.speechSynthesis) {
-    window.speechSynthesis.cancel();
-    currentUtterance = null;
-  }
-};
+// Keeping stopSpeech for backward compatibility, mapping to stopAllAudio
+export const stopSpeech = stopAllAudio;

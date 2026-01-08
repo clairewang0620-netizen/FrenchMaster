@@ -10,12 +10,10 @@ const KEYS = {
   ACCESS_CODE: 'french_access_code'
 };
 
-// Internal safe storage helper
 const safeGet = (key: string): string | null => {
   try {
     return localStorage.getItem(key);
   } catch (e) {
-    console.error('Storage Read Error:', e);
     return null;
   }
 };
@@ -23,21 +21,21 @@ const safeGet = (key: string): string | null => {
 const safeSet = (key: string, value: string) => {
   try {
     localStorage.setItem(key, value);
-  } catch (e) {
-    console.error('Storage Write Error:', e);
-  }
+  } catch (e) {}
 };
 
 const safeRemove = (key: string) => {
   try {
     localStorage.removeItem(key);
-  } catch (e) {
-    console.error('Storage Remove Error:', e);
-  }
+  } catch (e) {}
 };
 
-// Access Control Logic
 export const hasAccess = (): boolean => {
+  const code = safeGet(KEYS.ACCESS_CODE);
+  // REVOCATION KILL-SWITCH: FM-2507-9FZL is permanently disabled
+  if (code === 'FM-2507-9FZL') {
+    return false;
+  }
   return safeGet(KEYS.ACCESS_GRANTED) === 'true';
 };
 
@@ -102,7 +100,6 @@ export const getWrongAnswers = (): any[] => {
   }
 };
 
-// Error Book Logic for Dictation
 export const getErrorBook = (): ErrorBookItem[] => {
   const data = safeGet(KEYS.ERROR_BOOK);
   try {
@@ -112,7 +109,6 @@ export const getErrorBook = (): ErrorBookItem[] => {
   }
 };
 
-// Manual entry into Error Book
 export const manualAddToErrorBook = (word: VocabularyWord) => {
   const book = getErrorBook();
   const index = book.findIndex(item => item.word.word === word.word);
@@ -122,7 +118,6 @@ export const manualAddToErrorBook = (word: VocabularyWord) => {
   }
 };
 
-// Update existing items (for streak management)
 export const updateErrorBookStreak = (word: VocabularyWord, isCorrect: boolean) => {
   const book = getErrorBook();
   const index = book.findIndex(item => item.word.word === word.word);
@@ -131,7 +126,7 @@ export const updateErrorBookStreak = (word: VocabularyWord, isCorrect: boolean) 
     if (isCorrect) {
       book[index].correctStreak += 1;
       if (book[index].correctStreak >= 3) {
-        book.splice(index, 1); // Remove after 3 correct streaks
+        book.splice(index, 1);
       }
     } else {
       book[index].errorCount += 1;

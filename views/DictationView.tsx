@@ -42,7 +42,8 @@ const DictationView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const currentWord = currentGroup ? currentGroup[currentIndex] : null;
 
   const handlePlayWord = () => {
-    if (currentWord) speak(currentWord.word);
+    // Dictation uses 0.8 rate for pedagogical clarity
+    if (currentWord) speak(currentWord.word, 0.8);
   };
 
   const handleSubmit = () => {

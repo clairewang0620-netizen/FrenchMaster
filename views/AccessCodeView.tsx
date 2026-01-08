@@ -10,7 +10,7 @@ const VALID_CODES = [
 
   // —— 2025年7月批量访问码 ——
   "FM-2507-A9KQ", "FM-2507-7LXM", "FM-2507-Z82P", "FM-2507-Q4TN", "FM-2507-M8LA",
-  "FM-2507-KP93", "FM-2507-XR7C", "FM-2507-2JQW", "FM-2507-9FZL", "FM-2507-WM8T",
+  "FM-2507-KP93", "FM-2507-XR7C", "FM-2507-2JQW", "FM-2507-WM8T",
 
   "FM-2507-C7AQ", "FM-2507-4RKM", "FM-2507-TL29", "FM-2507-ZQ6F", "FM-2507-8MJP",
   "FM-2507-YW7C", "FM-2507-P2KR", "FM-2507-FM9A", "FM-2507-Q7LX", "FM-2507-AK8Z",
@@ -47,7 +47,7 @@ const AccessCodeView: React.FC<AccessCodeViewProps> = ({ onUnlock }) => {
       saveAccess(trimmedCode);
       onUnlock();
     } else {
-      setError('访问码无效，请检查后重试');
+      setError('访问码无效或已失效，请检查后重试');
     }
   };
 
