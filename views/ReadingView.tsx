@@ -1,8 +1,7 @@
-
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { ProficiencyLevel, ReadingArticle, ReadingParagraph } from '../types';
 import { STATIC_READING } from '../data/readingData';
-import { speak, pauseSpeech, resumeSpeech, stopAllAudio, playNativeAudio } from '../services/ttsService';
+import { speak, pauseSpeech, resumeSpeech, stopAllAudio } from '../services/ttsService';
 
 const ReadingView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [level, setLevel] = useState<ProficiencyLevel>('A1');
@@ -25,11 +24,10 @@ const ReadingView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [showAllZh, setShowAllZh] = useState(false);
   const [zhVisibility, setZhVisibility] = useState<Record<number, boolean>>({});
 
-  // Use refs for logic control
+  // Logic control using Refs for stability during rapid state changes
   const currentParagraphIndexRef = useRef<number | null>(null);
-  const currentSentenceIndexRef = useRef<number>(0);
-  const sentencesRef = useRef<string[]>([]);
   const isAutoPlayingRef = useRef<boolean>(false);
+  const isComponentMounted = useRef<boolean>(true);
 
   const levelArticles = useMemo(() => STATIC_READING[level] || [], [level]);
   const currentArticle = useMemo(() => {
@@ -37,29 +35,17 @@ const ReadingView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     return null;
   }, [levelArticles, selectedArticleId]);
 
-  const splitIntoSentences = (text: string): string[] => {
-    return text.match(/[^.!?]+[.!?]+(?:\s|$)/g)?.map(s => s.trim()) || [text];
-  };
-
-  // GLOBAL CLEANUP: Immediately stop ALL audio on unmount or blur
+  // GLOBAL CLEANUP & NAVIGATION STOP
   useEffect(() => {
-    const handleGlobalStop = () => {
+    isComponentMounted.current = true;
+    return () => {
+      isComponentMounted.current = false;
       stopAllAudio();
       stopRecording();
-      setRecordedUrl(null);
-      setShadowingParaIndex(null);
-    };
-
-    window.addEventListener('blur', handleGlobalStop);
-    window.addEventListener('beforeunload', handleGlobalStop);
-
-    return () => {
-      handleGlobalStop();
-      window.removeEventListener('blur', handleGlobalStop);
-      window.removeEventListener('beforeunload', handleGlobalStop);
     };
   }, []);
 
+  // Stop everything when switching articles
   useEffect(() => {
     handleStop();
     setZhVisibility({});
@@ -67,46 +53,52 @@ const ReadingView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     setRecordedUrl(null);
   }, [selectedArticleId]);
 
-  const playNextChunk = () => {
-    if (!currentArticle) return;
-    
-    if (currentSentenceIndexRef.current < sentencesRef.current.length) {
-      const text = sentencesRef.current[currentSentenceIndexRef.current];
-      
-      speak(text, playbackRate, () => {
-        if (currentParagraphIndexRef.current !== null && !window.speechSynthesis.paused) {
-          currentSentenceIndexRef.current += 1;
-          playNextChunk();
-        }
-      });
-    } 
-    else if (isAutoPlayingRef.current) {
-      const nextParaIndex = (currentParagraphIndexRef.current || 0) + 1;
-      if (nextParaIndex < currentArticle.paragraphs.length) {
-        startParagraphPlayback(nextParaIndex, true);
-      } else {
-        handleStop();
-      }
-    } else {
-      setActiveParagraphIndex(null);
-      currentParagraphIndexRef.current = null;
-    }
-  };
-
+  /**
+   * Sequence-locked paragraph playback.
+   * Sending the whole paragraph text to the TTS engine ensures 
+   * natural rhythm and native liaisons between sentences.
+   */
   const startParagraphPlayback = (paraIndex: number, autoPlay: boolean) => {
-    if (!currentArticle) return;
+    if (!currentArticle || !isComponentMounted.current) return;
     
-    // Stop recording and any existing user playback first
+    // Safety check for bounds
+    if (paraIndex >= currentArticle.paragraphs.length) {
+      handleStop();
+      return;
+    }
+
+    // Immediate state preparation
     stopRecording();
     setShadowingParaIndex(null);
-
     setActiveParagraphIndex(paraIndex);
-    currentParagraphIndexRef.current = paraIndex;
-    currentSentenceIndexRef.current = 0;
-    isAutoPlayingRef.current = autoPlay;
-    sentencesRef.current = splitIntoSentences(currentArticle.paragraphs[paraIndex].fr);
     
-    playNextChunk();
+    // Ref-based locking
+    currentParagraphIndexRef.current = paraIndex;
+    isAutoPlayingRef.current = autoPlay;
+    
+    const textToSpeak = currentArticle.paragraphs[paraIndex].fr;
+    
+    speak(textToSpeak, playbackRate, () => {
+      // Logic for sequencing: only proceed if we are still on the same track
+      if (isComponentMounted.current && currentParagraphIndexRef.current === paraIndex) {
+        if (isAutoPlayingRef.current) {
+          const nextParaIndex = paraIndex + 1;
+          if (nextParaIndex < currentArticle.paragraphs.length) {
+            // Force a micro-delay for UI stability between transitions
+            setTimeout(() => {
+              if (isComponentMounted.current && isAutoPlayingRef.current) {
+                startParagraphPlayback(nextParaIndex, true);
+              }
+            }, 100);
+          } else {
+            handleStop();
+          }
+        } else {
+          setActiveParagraphIndex(null);
+          currentParagraphIndexRef.current = null;
+        }
+      }
+    });
   };
 
   const handlePlayAll = () => {
@@ -115,8 +107,7 @@ const ReadingView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       resumeSpeech();
       setIsPaused(false);
     } else {
-      stopAllAudio();
-      stopRecording();
+      handleStop(); // Start fresh
       setIsPlayingAll(true);
       setIsPaused(false);
       startParagraphPlayback(0, true);
@@ -135,29 +126,30 @@ const ReadingView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     setIsPaused(false);
     setActiveParagraphIndex(null);
     currentParagraphIndexRef.current = null;
-    currentSentenceIndexRef.current = 0;
     isAutoPlayingRef.current = false;
   };
 
+  /**
+   * Toggles playback for a single paragraph.
+   * Guaranteed to play from start to finish unless stopped.
+   */
   const handlePlaySingle = (index: number) => {
-    stopAllAudio();
-    stopRecording();
-    setIsPlayingAll(false);
-    setIsPaused(false);
+    // If clicking same paragraph while playing (not in "Play All" mode) -> Toggle STOP
+    if (activeParagraphIndex === index && !isPlayingAll) {
+      handleStop();
+      return;
+    }
+    
+    // Interrupt current session and start this specific paragraph
+    handleStop();
     startParagraphPlayback(index, false);
   };
 
-  // SHADOWING FIX: Enter record state immediately in absolute silence
   const startShadowing = async (index: number) => {
     if (!currentArticle) return;
-    
-    // 1. Mandatory silence across the platform
-    handleStop();
-    
+    handleStop(); // Critical: Silence reading before starting microphone
     setShadowingParaIndex(index);
     setRecordedUrl(null);
-
-    // 2. Direct entry to recording mode
     await initRecording();
   };
 
@@ -177,8 +169,10 @@ const ReadingView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       mediaRecorder.onstop = () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
         const audioUrl = URL.createObjectURL(audioBlob);
-        setRecordedUrl(audioUrl);
-        setIsRecording(false);
+        if (isComponentMounted.current) {
+          setRecordedUrl(audioUrl);
+          setIsRecording(false);
+        }
       };
 
       mediaRecorder.start();
@@ -199,8 +193,8 @@ const ReadingView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   const playMyRecording = () => {
     if (recordedUrl) {
-      // Mutual exclusion: stop TTS if user plays their own voice
-      playNativeAudio(recordedUrl);
+      const audio = new Audio(recordedUrl);
+      audio.play().catch(e => console.warn('User recording playback failed:', e));
     }
   };
 
@@ -296,14 +290,14 @@ const ReadingView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 onClick={handlePlayAll}
                 className="px-6 py-2 bg-teal-600 text-white rounded-full text-sm font-bold shadow-lg hover:bg-teal-700 active:scale-95 transition-all flex items-center gap-2"
               >
-                {isPaused ? '继续' : '播放全文'}
+                {isPaused ? '继续播放' : '播放全文'}
               </button>
             ) : (
               <button 
                 onClick={handlePause}
                 className="px-6 py-2 bg-slate-800 text-white rounded-full text-sm font-bold shadow-lg hover:bg-slate-900 active:scale-95 transition-all flex items-center gap-2"
               >
-                暂停
+                暂停播放
               </button>
             )}
 
@@ -346,9 +340,9 @@ const ReadingView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                     </button>
                     <button 
                       onClick={() => handlePlaySingle(idx)}
-                      className={`flex items-center gap-1 text-[10px] font-black px-3 py-1 rounded-full transition-all ${activeParagraphIndex === idx && !isPlayingAll ? 'bg-teal-600 text-white shadow-sm' : 'bg-teal-50 text-teal-600 hover:bg-teal-100'}`}
+                      className={`flex items-center gap-1 text-[10px] font-black px-3 py-1 rounded-full transition-all ${activeParagraphIndex === idx && !isPlayingAll ? 'bg-teal-600 text-white shadow-sm animate-pulse' : 'bg-teal-50 text-teal-600 hover:bg-teal-100'}`}
                     >
-                      朗读
+                      {activeParagraphIndex === idx && !isPlayingAll ? '停止' : '朗读'}
                     </button>
                     <button 
                       onClick={() => startShadowing(idx)}

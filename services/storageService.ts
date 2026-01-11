@@ -1,4 +1,3 @@
-
 import { VocabularyWord, ErrorBookItem } from '../types';
 
 const KEYS = {
@@ -32,8 +31,9 @@ const safeRemove = (key: string) => {
 
 export const hasAccess = (): boolean => {
   const code = safeGet(KEYS.ACCESS_CODE);
-  // REVOCATION KILL-SWITCH: FM-2507-9FZL is permanently disabled
-  if (code === 'FM-2507-9FZL') {
+  // REVOCATION KILL-SWITCH: Specific codes permanently disabled
+  const REVOKED_CODES = ['FM-2507-9FZL', 'FM-2507-WM8T'];
+  if (code && REVOKED_CODES.includes(code)) {
     return false;
   }
   return safeGet(KEYS.ACCESS_GRANTED) === 'true';

@@ -1,5 +1,6 @@
-
 export type ProficiencyLevel = 'A1' | 'A2' | 'B1' | 'B2' | 'C1';
+
+export type VocabularyCategory = '情绪类' | '日常生活类' | '食物类' | '其他类' | '时间类' | '餐饮消费';
 
 export interface VocabularyWord {
   id: string;
@@ -7,6 +8,7 @@ export interface VocabularyWord {
   phonetic: string;
   meaning: string;
   level: ProficiencyLevel;
+  category: VocabularyCategory;
   examples: {
     sentence: string;
     ipa?: string; // Phonetic transcription for the example sentence
@@ -42,7 +44,7 @@ export interface ErrorBookItem {
 
 export interface ReadingParagraph {
   fr: string;
-  ipa: string;
+  ipa?: string;
   zh: string;
 }
 
