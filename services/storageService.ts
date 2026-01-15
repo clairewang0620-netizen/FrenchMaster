@@ -32,7 +32,7 @@ const safeRemove = (key: string) => {
 export const hasAccess = (): boolean => {
   const code = safeGet(KEYS.ACCESS_CODE);
   // REVOCATION KILL-SWITCH: Specific codes permanently disabled
-  const REVOKED_CODES = ['FM-2507-9FZL', 'FM-2507-WM8T'];
+  const REVOKED_CODES = ['FM-2507-9FZL', 'FM-2507-WM8T', 'FM-2507-C7AQ', 'FM-2507-AK8Z', 'FM-2507-Q7LX'];
   if (code && REVOKED_CODES.includes(code)) {
     return false;
   }
